@@ -116,7 +116,7 @@ class App extends Component {
         </div>
         <div style={{padding: "2em 0", color:"white", backgroundColor: "#000000"}}>
           <Container>
-            © 2018 Trace
+            © 2020 Chrysalis Software Solutions
           </Container>
         </div>
       </div>

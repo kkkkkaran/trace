@@ -161,7 +161,7 @@ class View extends Component {
     const versionsList = this.state.versions.map((version, index) => {
       return (
         <li key={index}>
-          <Link to={`/products/${this.props.match.params.productId}/versions/${version.id}`}>Version {index + 1}</Link>
+          <a href={`/products/${this.props.match.params.productId}/versions/${version.id}`}>Version {index + 1}</a>
         </li>
       )
     }).reverse()
@@ -289,11 +289,11 @@ class View extends Component {
           panelContent={
             <div>
               { this.props.match.params.versionId && this.state.versions && this.state.versions.length > 0 && this.props.match.params.versionId.toString() !== this.state.versions.slice(-1)[0].id.toString() ?
-                  <Link to={"/products/" + this.props.match.params.productId}>
+                  <a href={"/products/" + this.props.match.params.productId}>
                     <Button color="info">
                       View latest version
                     </Button>
-                  </Link>
+                  </a>
                 :
                   <Link to={"/products/" + this.props.match.params.productId + "/update"}>
                     <Button color="success">

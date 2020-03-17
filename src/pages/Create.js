@@ -101,6 +101,7 @@ class Create extends Component {
     geocodeByAddress(this.state.address)
       .then(results => getLatLng(results[0]))
       .then(latLng => {
+        console.log(latLng)
         this.setState({latitude: latLng.lat, longitude: latLng.lng, buttonDisabled: false})
       })
       .catch(error => console.error('Error', error))

@@ -38,7 +38,7 @@ class MyProducts extends Component {
               }
 
               this.setState({products: [...this.state.products, product]})
-              console.log(String(productId).valueOf());
+              
               
             })
             .catch((error) => {

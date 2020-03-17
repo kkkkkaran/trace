@@ -26,16 +26,18 @@ class CombineList extends Component {
       latitude: '',
       longitude: '',
       address: '',
-      availableCertifications: [],
+      //availableCertifications: [],
       buttonDisabled: false,
-      selectedCertifications: {},
+      //selectedCertifications: {},
       customDataInputs: {},
-      products: []
+      products: [],
+      productParts: {}
     }
     this.onChange = (address) => this.setState({ address })
   }
 
   componentDidMount(){
+    /*
     this.props.passageInstance.getAllCertificationsIds()
       .then((result) => {
         result.map((certificationId) => {
@@ -50,11 +52,10 @@ class CombineList extends Component {
             });
           return false;
         });
-    })
+    })*/
 
     this.props.passageInstance.getOwnerProducts()
       .then((result) => {
-
         result.map((productId) => {
           this.props.passageInstance.getProductById(String(productId).valueOf(), "latest")
             .then((result) => {
@@ -68,7 +69,9 @@ class CombineList extends Component {
                 versions: result[5],
                 id: productId,
               }
-              this.setState({products: [...this.state.products, product]})
+              if(!result[7]){
+                this.setState({products: [...this.state.products, product]})
+              }
             })
             .catch((error) => {
               console.log(error);
@@ -78,12 +81,22 @@ class CombineList extends Component {
       });
   }
 
+  /*
   handleChange = (e) => {
     const certificationId = e.target.name;
     this.setState({selectedCertifications: {...this.state.selectedCertifications, [certificationId]: e.target.checked}})
   }
+  */
 
-  handleCreateNewProduct = () => {
+  handleProductChange = (e) => {
+    const productId = e.target.value;
+    
+    this.setState({productParts: {...this.state.productParts, [productId]: e.target.checked}})
+    
+  }
+
+  handleMergeProducts = () => {
+    /*
     const selectedCertifications = this.state.selectedCertifications;
     const certificationsArray = [];
     Object.keys(selectedCertifications).map(key => {
@@ -91,14 +104,18 @@ class CombineList extends Component {
         certificationsArray.push(key)
       }
       return false;
-    })
+    })*/
 
-    var customDataObject = {}
-    Object.keys(this.state.customDataInputs).map(inputKey => {
-      customDataObject[this.state.customDataInputs[inputKey].key] = this.state.customDataInputs[inputKey].value;
+    const productParts = this.state.productParts;
+    var productPartsObject = [];
+    Object.keys(productParts).map(key => {
+      if(productParts[key] === true){
+        productPartsObject.push(key)
+      }
       return false;
     })
-    this.props.passageInstance.createProduct(this.state.name, this.state.description, this.state.latitude.toString(), this.state.longitude.toString(), certificationsArray, JSON.stringify(customDataObject), {from: this.props.web3Accounts[0], gas:1000000})
+    
+    this.props.passageInstance.combineProducts(productPartsObject, this.state.name, this.state.description, this.state.latitude.toString(), this.state.longitude.toString(), {from: this.props.web3Accounts[0], gas:1000000})
       .then((result) => {
         // product created! ... but we use an event watcher to show the success message, so nothing actuelly happens here after we create a product
       })
@@ -115,17 +132,14 @@ class CombineList extends Component {
       .catch(error => console.error('Error', error))
   }
 
-  appendInput() {
-    var newInputKey = `input-${Object.keys(this.state.customDataInputs).length}`; // this might not be a good idea (e.g. when removing then adding more inputs)
-    this.setState({ customDataInputs: {...this.state.customDataInputs, [newInputKey]: {key: "", value: ""} }});
-  }
+  
 
   render() {
     const products = this.state.products.map((product, index) => {
       return (
         <div key={index}>
           <FormGroup>
-            <Input type="checkbox" name="productSelection" onChange={(e) => {}}></Input>
+            <Input type="checkbox" name="productSelection" value={product.id} onChange={this.handleProductChange}></Input>
           </FormGroup>
           <Link to={`/products/${product.id}`}>
             <div>
@@ -191,10 +205,11 @@ class CombineList extends Component {
               <FormGroup>
                 <Label>
                   Certification(s)
-                  <Link style={{marginLeft: "10px"}} to="/createcertification">Create +</Link>
+                 
+
                 </Label>
                 <div>
-                  {this.state.availableCertifications && this.state.availableCertifications.length > 0 ?
+                  {/**this.state.availableCertifications && this.state.availableCertifications.length > 0 ?
                     this.state.availableCertifications.map((certification, index) => 
                       <div key={index}>
                         <input style={{marginRight: "5px"}} onChange={this.handleChange} name={certification.id} type="checkbox"></input>
@@ -205,12 +220,14 @@ class CombineList extends Component {
                     <div style={{marginLeft:"15px"}}>
                       No certification available.
                       <Link style={{marginLeft: "10px"}} to="/createcertification">Create a certification</Link>
-                    </div>
+                    </div>**/
                   }
+                  
+                 <p>Certifications and custom data can be modified after the merge.</p>
                 </div>
               </FormGroup>
             </div>
-          }
+                }
         />
         <AnnotatedSection
           annotationContent={
@@ -221,7 +238,7 @@ class CombineList extends Component {
           }
           panelContent={
             <div>
-              <Button disabled={this.state.buttonDisabled} color="primary" onClick={this.handleCreateNewProduct}>Combine products</Button>
+              <Button disabled={this.state.buttonDisabled} color="primary" onClick={this.handleMergeProducts}>Combine products</Button>
             </div>
           }
         />

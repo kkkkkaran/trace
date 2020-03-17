@@ -61,6 +61,7 @@ class App extends Component {
 
         // remember the current web3 account
         var currentAccount = accounts[0];
+        this.props.web3.eth.defaultAccount = accounts[0]; // default account
 
         // every 1000ms, check if the web3 account changed
         setInterval(() => {

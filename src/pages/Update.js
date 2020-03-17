@@ -54,7 +54,8 @@ class Update extends Component {
       .catch((error) => {
         // if something goes wrong when fetching the product, we just redirect
         // to the home page to prevent displaying false/wrong information
-        return this.props.history.push('/');
+        //return this.props.history.push('/');
+        console.log(error);
       })
   }
 

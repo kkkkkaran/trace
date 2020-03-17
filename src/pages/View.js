@@ -11,6 +11,7 @@ import faWrench from '@fortawesome/fontawesome-free-solid/faWrench'
 import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
 import faCertificate from '@fortawesome/fontawesome-free-solid/faCertificate'
 import faHistory from '@fortawesome/fontawesome-free-solid/faHistory'
+import faList from '@fortawesome/fontawesome-free-solid/faList'
 
 import AnnotatedSection from '../components/AnnotatedSection'
 
@@ -27,6 +28,7 @@ class View extends Component {
 
   constructor(props) {
     super(props);
+    
 
     // product information definition
     this.state = {
@@ -37,8 +39,11 @@ class View extends Component {
       versionCreationDate: "",
       versions: [],
       certifications: [],
+      parents: [],
       id: "",
-      customDataJson: ""
+      customDataJson: "",
+      archived: false,
+      
     };
   }
 
@@ -63,7 +68,8 @@ class View extends Component {
           versionCreationDate: new Date(result[4].c * 1000).toString(),
           versions: [],
           id: props.match.params.productId,
-          certifications: []
+          certifications: [],
+          archived: result[7]
         })
 
         // then, we fetch the product's certification details
@@ -79,6 +85,28 @@ class View extends Component {
               this.setState({certifications: [...this.state.certifications, certification]})
             });
         });
+
+        //fetch product parents
+        this.props.passageInstance.getProductParents(String(props.match.params.productId).valueOf())
+              .then((result) => {
+                result.map((productId) => {
+                  this.props.passageInstance.getProductById(String(productId).valueOf(), "latest")
+                    .then((result) => {
+                      const parent = {
+                        name: result[0],
+                        description: result[1],
+                        latitude: parseFloat(result[2]),
+                        longitude: parseFloat(result[3]),
+                        versionCreationDate: Date(result[4]),
+                        versions: result[5],
+                        id: productId,
+                      }
+        
+                      this.setState({parents: [...this.state.parents, parent]})
+                    });
+                    return false;
+                });
+              })
 
         // then, we get the product's versions list
         const versionsArray = result[5];
@@ -117,6 +145,17 @@ class View extends Component {
   }
 
   render() {
+    //render for product parents
+    const parents = this.state.parents.map((parent, index) => {
+      return (
+        <a key={index} href={`/products/${parent.id}` }>
+          <div key={index}>
+            <b>{parent.name || "Untitled product"}</b> &mdash; {parent.description || "No description"}
+            <hr/>
+          </div>
+        </a>
+      )
+    })
 
     // this is the JSX of the versions list section of the page
     const versionsList = this.state.versions.map((version, index) => {
@@ -325,6 +364,25 @@ class View extends Component {
               <ul>
                 {versionsList}
               </ul>
+            </div>
+          }
+        />
+
+        {/* Parents Section */}
+        <AnnotatedSection
+          annotationContent={
+            <div>
+              <FontAwesomeIcon fixedWidth style={{paddingTop:"3px", marginRight:"6px"}} icon={faList}/>
+              Product Parents
+             
+            </div>
+          }
+          panelContent={
+            <div>
+              {parents && parents.length > 0 ? parents : 
+              <div>
+                This Product has no parents.
+              </div>}
             </div>
           }
         />

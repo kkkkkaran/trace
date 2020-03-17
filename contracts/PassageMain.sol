@@ -96,25 +96,25 @@ contract PassageMain is PassageHelper {
     }
 
     function getProductById(bytes32 _productId, bytes32 specificVersionId) external view productIdExists(_productId)
-    returns (string name, string description, string _latitude, string _longitude, uint versionCreationDate, bytes32[] versions, bytes32[] certificationsIds) {
+    returns (string name, string description, string _latitude, string _longitude, uint versionCreationDate, bytes32[] versions, bytes32[] certificationsIds, bool archived) {
 
       // Get the requested product from storage
-      Product storage product = productIdToProductStruct[_productId];
+      Product storage p = productIdToProductStruct[_productId];
 
       // Initialize a variable that will hold the requested product version struct
-      ProductVersion storage requestedVersion;
+      ProductVersion storage rv;
 
       if (specificVersionId == "latest") {
         // Get the latest product version
-        requestedVersion = versionIdToVersionStruct[product.latestVersionId];
+        rv = versionIdToVersionStruct[p.latestVersionId];
 
       } else {
         // Get the requested product version
-        requestedVersion = versionIdToVersionStruct[specificVersionId];
+        rv = versionIdToVersionStruct[specificVersionId];
       }
 
       // Return the requested data
-      return (product.name, product.description, requestedVersion.latitude, requestedVersion.longitude, requestedVersion.creationDate, product.versions, product.certificationsIds);
+      return (p.name, p.description, rv.latitude, rv.longitude, rv.creationDate, p.versions, p.certificationsIds, p.archived);
 
       // TODO: return the product versions using another function (i.e. getProductVersions(_productId))
       // instead of directly (as above)
@@ -162,7 +162,11 @@ contract PassageMain is PassageHelper {
         }
     }
 
-    function combineProducts(bytes32[] _parts, string _name, string _description, string _latitude, string _longitude) public 
+    function getProductParents(bytes32 _child) external view returns (bytes32[] parentArray) {
+        return nodeToParents[_child];
+    }
+
+    function combineProducts(bytes32[] _parts, string _name, string _description, string _latitude, string _longitude) public
     returns (bytes32 newProductId) {
 
         bytes32[] memory finalCertificationIds = mergeCertifications(_parts);
@@ -170,7 +174,7 @@ contract PassageMain is PassageHelper {
         var createdProductId = createProduct(_name, _description, _latitude, _longitude, finalCertificationIds, "");
         for (uint i = 0; i < _parts.length; ++i) {
             nodeToParents[createdProductId].push(_parts[i]);
-            productIdToProductStruct[_parts[i]].archived = true;
+            //productIdToProductStruct[_parts[i]].archived = true;
         }
 
         return createdProductId;
@@ -218,8 +222,8 @@ contract PassageMain is PassageHelper {
                 activeProducts[i] = ownedProductsIds[i];
             }
         }
-
-        return activeProducts;
+        //return activeProducts;
+        return ownedProductsIds;
     }
 
     function createCertification(

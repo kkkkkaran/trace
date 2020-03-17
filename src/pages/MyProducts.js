@@ -34,13 +34,18 @@ class MyProducts extends Component {
                 versionCreationDate: Date(result[4]),
                 versions: result[5],
                 id: productId,
+                archived: result[7]
               }
+
               this.setState({products: [...this.state.products, product]})
+              console.log(String(productId).valueOf());
+              
             })
             .catch((error) => {
               console.log(error);
             })
           return false;
+          
         })
       });
   }
@@ -50,7 +55,7 @@ class MyProducts extends Component {
       return (
         <Link key={index} to={`/products/${product.id}`}>
           <div key={index}>
-            <b>{product.name || "Untitled product"}</b> &mdash; {product.description || "No description"}
+            <b>{product.name || "Untitled product"}</b> &mdash; {product.description || "No description"} 
             <hr/>
           </div>
         </Link>

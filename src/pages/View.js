@@ -92,6 +92,7 @@ class View extends Component {
                 result.map((productId) => {
                   this.props.passageInstance.getProductById(String(productId).valueOf(), "latest")
                     .then((result) => {
+                      console.log(result);
                       const parent = {
                         name: result[0],
                         description: result[1],

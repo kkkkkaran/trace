@@ -54,12 +54,14 @@ class CombineList extends Component {
         });
     })*/
 
-    this.props.passageInstance.getOwnerProducts()
+    this.props.passageInstance.getOwnerProducts({ from: this.props.web3Accounts[0] })
       .then((result) => {
+        
         result.map((productId) => {
           this.props.passageInstance.getProductById(String(productId).valueOf(), "latest")
             .then((result) => {
               var _this = this;
+              console.log(result);
               const product = {
                 name: result[0],
                 description: result[1],

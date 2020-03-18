@@ -174,7 +174,7 @@ contract PassageMain is PassageHelper {
         var createdProductId = createProduct(_name, _description, _latitude, _longitude, finalCertificationIds, "");
         for (uint i = 0; i < _parts.length; ++i) {
             nodeToParents[createdProductId].push(_parts[i]);
-            //productIdToProductStruct[_parts[i]].archived = true;
+            productIdToProductStruct[_parts[i]].archived = true;
         }
 
         return createdProductId;

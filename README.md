@@ -1,6 +1,4 @@
-### ⚠️ **This project is not supported anymore. Here be dragons!** ⚠️
 
-------------
 
 ![logo](https://user-images.githubusercontent.com/8457808/38818082-db3aea62-4167-11e8-8e59-7af47131c087.png)
 
